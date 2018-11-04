@@ -10,12 +10,15 @@
 class ball
 {
 public:
-	int x;
-	int y;
-	int speed;
-	sf::Vector2f direction;
-	int radius;
+	//float x, y;
+	float speed;
+	sf::Vector2f pos;
+	sf::Vector2f vel;
+	sf::Vector2f dir;
+	float radius;
 
-	sf::CircleShape SpawnBall(int, int, int);
+	sf::CircleShape SpawnBall(int, int, float);
+	sf::CircleShape PrintBall();
+	void StartBall(sf::Vector2f &, float, float, int);
 };
 

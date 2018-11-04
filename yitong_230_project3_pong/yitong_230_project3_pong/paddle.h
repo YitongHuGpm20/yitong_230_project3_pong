@@ -10,13 +10,14 @@
 class paddle
 {
 public:
-	int x;
-	int y;
-	int length;
+	float x;
+	float y;
+	float length;
 	float speed = 0.5;
 	float move = 0;
 
-	sf::RectangleShape SpawnPads(int, int, int, int, bool);
+	sf::RectangleShape SpawnPads(int, int, float, float, bool);
 	void PlayerControl(int);
+	void AIMove(int, float, float);
 };
 
