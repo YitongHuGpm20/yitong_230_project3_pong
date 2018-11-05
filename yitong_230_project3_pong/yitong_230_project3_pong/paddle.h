@@ -13,6 +13,7 @@ public:
 	float x;
 	float y;
 	float length;
+	float width;
 	float speed = 0.5;
 	float move = 0;
 

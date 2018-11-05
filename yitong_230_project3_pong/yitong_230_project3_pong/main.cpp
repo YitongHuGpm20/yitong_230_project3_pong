@@ -9,8 +9,11 @@
 #include "ball.h"
 #include "paddle.h"
 #include <ctime>
+#include <chrono>
+#include <thread>
 
 using namespace std;
+using namespace sf;
 
 int main()
 {
@@ -22,17 +25,21 @@ int main()
 	float ax = rand() % screenw - (screenw / 2);
 	float ay = rand() % screenh - (screenh / 2);
 	float angle = atan2f(ay, ax);
+	float speed = 0.3;
+	float radius = 20;
 	
-	sf::RenderWindow window(sf::VideoMode(screenw, screenh), "Yitong's Pong");
-	sf::RectangleShape middle;
-	middle.setSize(sf::Vector2f(3.f, screenh));
-	middle.setPosition(sf::Vector2f(((screenw - 3) / 2), 0));
-	window.draw(ball.SpawnBall(screenw, screenh, 20));
+	RenderWindow window(VideoMode(screenw, screenh), "Yitong's Pong");
+	RectangleShape middle;
+	middle.setSize(Vector2f(3.f, screenh));
+	middle.setPosition(Vector2f(((screenw - 3) / 2), 0));
+	window.draw(ball.SpawnBall(screenw, screenh, radius));
+	//chrono::seconds dura(5);
+	//this_thread::sleep_for(dura);
 	
 	while (window.isOpen()){
-		sf::Event event;
+		Event event;
 		while (window.pollEvent(event)){
-			if (event.type == sf::Event::Closed)
+			if (event.type == Event::Closed)
 				window.close();
 		}
 		window.clear();
@@ -43,7 +50,12 @@ int main()
 		window.display();
 		pad1.PlayerControl(screenh);
 		pad2.AIMove(screenh, ball.pos.y, ball.radius);
-		ball.StartBall(ball.pos, angle, 0.3, screenh);
+		if (ball.BouncePaddle(pad1) || ball.BouncePaddle(pad2)) {
+			ax = -ax;
+			speed += 0.01;
+		}
+		angle = atan2f(ay, ax);
+		ball.MoveBall(ball.pos, angle, speed, screenh);
 	}
 
 	return 0;

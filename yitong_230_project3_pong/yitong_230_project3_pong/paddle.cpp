@@ -21,27 +21,24 @@ sf::RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, floa
 	shape.setSize(sf::Vector2f(width, length));
 	shape.setPosition(sf::Vector2f(x, y));
 	this->length = length;
+	this->width = width;
 	return shape;
 }
 
 void paddle::PlayerControl(int screenh) {
-	//if (y >= 0 && (y + length) <= screenh) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-			if (move >= ((length - screenh) / 2))
-				move -= speed;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-			if (move <= ((screenh - length) / 2))
-				move += speed;
-		}
-	//}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+		if (move >= ((length - screenh) / 2))
+			move -= speed;
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+		if (move <= ((screenh - length) / 2))
+			move += speed;
+	}
 }
 
 void paddle::AIMove(int screenh, float bally, float radius) {
-	//if (y >= 0 && (y + length) <= screenh) {
-		if ((y + length) < (bally + radius))
-			move += speed;
-		else if (y > (bally + radius))
-			move -= speed;
-	//}
+	if (y + length < bally + radius && move <= (screenh - length) / 2)
+		move += speed;
+	else if (y > bally + radius && move >= (length - screenh) / 2)
+		move -= speed;
 }

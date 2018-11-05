@@ -5,20 +5,22 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
+#include "paddle.h"
 #pragma once
+
+using namespace sf;
 
 class ball
 {
 public:
-	//float x, y;
-	float speed;
-	sf::Vector2f pos;
-	sf::Vector2f vel;
-	sf::Vector2f dir;
+	Vector2f pos;
+	Vector2f dir;
+	Vector2f center;
 	float radius;
 
-	sf::CircleShape SpawnBall(int, int, float);
-	sf::CircleShape PrintBall();
-	void StartBall(sf::Vector2f &, float, float, int);
+	CircleShape SpawnBall(int, int, float);
+	CircleShape PrintBall();
+	void MoveBall(Vector2f &, float, float, int);
+	bool BouncePaddle(paddle);
 };
 
