@@ -9,8 +9,6 @@
 #include "ball.h"
 #include "paddle.h"
 #include <ctime>
-#include <chrono>
-#include <thread>
 #include <string>
 #include <sstream>
 
@@ -24,20 +22,27 @@ string toString(T arg){
 	return ss.str();
 }
 
+int screenw = 800;
+int screenh = 600;
+int scoreLeft = 0, scoreRight = 0;
+string scoreLefttext, scoreRighttext, printscore;
+bool isWon = false;
+
 int main()
 {
 	srand(time(0));
-	int screenw = 800;
-	int screenh = 600;
 	ball ball;
 	paddle pad1, pad2;
-	float ax = rand() % screenw - (screenw / 2);
-	float ay = rand() % screenh - (screenh / 2);
+	float ax, ay;
+	do {
+		ax = rand() % screenw - (screenw / 2);
+		ay = rand() % screenh - (screenh / 2);
+	} while (ax * ax < ay * ay);
 	float angle = atan2f(ay, ax);
-	float speed = 0.3;
+	float speed = 0.4;
 	float radius = 20;
-	int scoreLeft = 0, scoreRight = 0;
-	string scoreLefttext, scoreRighttext, printscore;
+	int countwin = 0;
+	int count = 0;
 
 	RenderWindow window(VideoMode(screenw, screenh), "Yitong's Pong");
 	RectangleShape middle;
@@ -52,8 +57,6 @@ int main()
 	score.setString("0  0");
 	score.setPosition(screenw / 2 - 40, 0);
 	score.setFillColor(Color::Cyan);
-	//chrono::seconds dura(5);
-	//this_thread::sleep_for(dura);
 	
 	while (window.isOpen()){
 		Event event;
@@ -61,6 +64,7 @@ int main()
 			if (event.type == Event::Closed)
 				window.close();
 		}
+		isWon = false;
 		window.clear();
 		window.draw(middle);
 		window.draw(score);
@@ -77,24 +81,82 @@ int main()
 		if (ball.BounceWall(screenh))
 			ay = -ay;
 		angle = atan2f(ay, ax);
-		ball.MoveBall(ball.pos, angle, speed, screenh);
+		count++;
+		if(count >= 1000)
+			ball.MoveBall(ball.pos, angle, speed, screenh);
 		if (ball.pos.x <= ball.radius * (-2)) {
 			scoreRight++;
 			ball.pos.x = screenw / 2 - radius;
 			ball.pos.y = screenh / 2 - radius;
-			ax = rand() % screenw - (screenw / 2);
-			ay = rand() % screenh - (screenh / 2);
+			do {
+				ax = rand() % screenw - (screenw / 2);
+				ay = rand() % screenh - (screenh / 2);
+			} while (ax * ax < ay * ay);
 			angle = atan2f(ay, ax);
-			speed = 0.3;
+			speed = 0.4;
+			count = 0;
 		}
 		if (ball.pos.x >= screenw) {
 			scoreLeft++;
 			ball.pos.x = screenw / 2 - radius;
 			ball.pos.y = screenh / 2 - radius;
-			ax = rand() % screenw - (screenw / 2);
-			ay = rand() % screenh - (screenh / 2);
+			do {
+				ax = rand() % screenw - (screenw / 2);
+				ay = rand() % screenh - (screenh / 2);
+			} while (ax * ax < ay * ay);
 			angle = atan2f(ay, ax);
-			speed = 0.3;
+			speed = 0.4;
+			count = 0;
+		}
+		Text win;
+		win.setFont(font);
+		win.setCharacterSize(24);
+		win.setPosition(60, 10);
+		win.setFillColor(Color::Yellow);
+		Text restart;
+		restart.setFont(font);
+		restart.setCharacterSize(24);
+		restart.setPosition(10, 60);
+		restart.setFillColor(Color::Yellow);
+		restart.setString("Press Space to Restart...");
+		if (scoreLeft == 5) {
+			win.setString("Player One won!");
+			isWon = true;
+		}
+		else if (scoreRight == 5) {
+			win.setString("Player Two won!");
+			isWon = true;
+		}
+		if (isWon) {
+			scoreLeft = 0;
+			scoreRight = 0;
+			/*do {
+				window.draw(win);
+				countwin++;
+			} while (countwin <= 1000);*/
+			ball.pos.x = screenw / 2 - radius;
+			ball.pos.y = screenh / 2 - radius;
+			do {
+				ax = rand() % screenw - (screenw / 2);
+				ay = rand() % screenh - (screenh / 2);
+			} while (ax * ax < ay * ay);
+			angle = atan2f(ay, ax);
+			speed = 0.4;
+			count = 0;
+			RenderWindow message(VideoMode(300, 100), "Winner");
+
+			while (message.isOpen()) {
+				Event eventm;
+				while (message.pollEvent(eventm)) {
+					if (Keyboard::isKeyPressed(Keyboard::Space) || eventm.type == Event::Closed)
+						message.close();
+				}
+				message.clear();
+				message.draw(win);
+				message.draw(restart);
+				message.display();
+			}
+			
 		}
 		scoreLefttext = toString<int>(scoreLeft);
 		scoreRighttext = toString<int>(scoreRight);

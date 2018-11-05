@@ -10,35 +10,38 @@
 #include <ctime>
 
 using namespace std;
+using namespace sf;
 
-sf::RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float length, bool isLeft) {
+RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float length, bool isLeft) {
 	if (isLeft)
 		x = 0;
 	else 
 		x = screenw - width;
 	y = (screenh - length) / 2 + move;
-	sf::RectangleShape shape;
-	shape.setSize(sf::Vector2f(width, length));
-	shape.setPosition(sf::Vector2f(x, y));
+	RectangleShape shape;
+	shape.setSize(Vector2f(width, length));
+	shape.setPosition(Vector2f(x, y));
 	this->length = length;
 	this->width = width;
 	return shape;
 }
 
 void paddle::PlayerControl(int screenh) {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+	if (Keyboard::isKeyPressed(Keyboard::W)) {
 		if (move >= ((length - screenh) / 2))
 			move -= speed;
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+	else if (Keyboard::isKeyPressed(Keyboard::S)) {
 		if (move <= ((screenh - length) / 2))
 			move += speed;
 	}
 }
 
 void paddle::AIMove(int screenh, float bally, float radius) {
-	if (y + length < bally + radius && move <= (screenh - length) / 2)
+	srand(time(0));
+	float miss = rand() % 40;
+	if (y + length + miss < bally + radius && move <= (screenh - length) / 2)
 		move += speed;
-	else if (y > bally + radius && move >= (length - screenh) / 2)
+	else if (y - miss > bally + radius && move >= (length - screenh) / 2)
 		move -= speed;
 }
