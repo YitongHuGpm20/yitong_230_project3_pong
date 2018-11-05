@@ -22,5 +22,6 @@ public:
 	CircleShape PrintBall();
 	void MoveBall(Vector2f &, float, float, int);
 	bool BouncePaddle(paddle);
+	bool BounceWall(int);
 };
 

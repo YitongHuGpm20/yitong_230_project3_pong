@@ -11,9 +11,18 @@
 #include <ctime>
 #include <chrono>
 #include <thread>
+#include <string>
+#include <sstream>
 
 using namespace std;
 using namespace sf;
+
+template <typename T>
+string toString(T arg){
+	stringstream ss;
+	ss << arg;
+	return ss.str();
+}
 
 int main()
 {
@@ -27,12 +36,22 @@ int main()
 	float angle = atan2f(ay, ax);
 	float speed = 0.3;
 	float radius = 20;
-	
+	int scoreLeft = 0, scoreRight = 0;
+	string scoreLefttext, scoreRighttext, printscore;
+
 	RenderWindow window(VideoMode(screenw, screenh), "Yitong's Pong");
 	RectangleShape middle;
 	middle.setSize(Vector2f(3.f, screenh));
 	middle.setPosition(Vector2f(((screenw - 3) / 2), 0));
 	window.draw(ball.SpawnBall(screenw, screenh, radius));
+	Font font;
+	font.loadFromFile("arial.ttf");
+	Text score;
+	score.setFont(font);
+	score.setCharacterSize(48);
+	score.setString("0  0");
+	score.setPosition(screenw / 2 - 40, 0);
+	score.setFillColor(Color::Cyan);
 	//chrono::seconds dura(5);
 	//this_thread::sleep_for(dura);
 	
@@ -44,6 +63,7 @@ int main()
 		}
 		window.clear();
 		window.draw(middle);
+		window.draw(score);
 		window.draw(ball.PrintBall());
 		window.draw(pad1.SpawnPads(screenw, screenh, 20, 120, true));
 		window.draw(pad2.SpawnPads(screenw, screenh, 20, 120, false));
@@ -52,11 +72,34 @@ int main()
 		pad2.AIMove(screenh, ball.pos.y, ball.radius);
 		if (ball.BouncePaddle(pad1) || ball.BouncePaddle(pad2)) {
 			ax = -ax;
-			speed += 0.01;
+			speed += 0.02;
 		}
+		if (ball.BounceWall(screenh))
+			ay = -ay;
 		angle = atan2f(ay, ax);
 		ball.MoveBall(ball.pos, angle, speed, screenh);
+		if (ball.pos.x <= ball.radius * (-2)) {
+			scoreRight++;
+			ball.pos.x = screenw / 2 - radius;
+			ball.pos.y = screenh / 2 - radius;
+			ax = rand() % screenw - (screenw / 2);
+			ay = rand() % screenh - (screenh / 2);
+			angle = atan2f(ay, ax);
+			speed = 0.3;
+		}
+		if (ball.pos.x >= screenw) {
+			scoreLeft++;
+			ball.pos.x = screenw / 2 - radius;
+			ball.pos.y = screenh / 2 - radius;
+			ax = rand() % screenw - (screenw / 2);
+			ay = rand() % screenh - (screenh / 2);
+			angle = atan2f(ay, ax);
+			speed = 0.3;
+		}
+		scoreLefttext = toString<int>(scoreLeft);
+		scoreRighttext = toString<int>(scoreRight);
+		printscore = scoreLefttext + "  " + scoreRighttext;
+		score.setString(printscore);
 	}
-
 	return 0;
 }

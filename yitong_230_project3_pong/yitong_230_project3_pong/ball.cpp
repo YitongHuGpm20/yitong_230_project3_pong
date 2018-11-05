@@ -35,15 +35,14 @@ CircleShape ball::SpawnBall(int screenw, int screenh, float radius) {
 CircleShape ball::PrintBall() {
 	center.x = pos.x + radius;
 	center.y = pos.y + radius;
-	CircleShape shape(this->radius);
+	CircleShape shape(radius);
 	shape.setPosition(Vector2f(pos));
 	return shape;
 }
 
 void ball::MoveBall(Vector2f& point, float angle, float dist, int screenh) {
 	Vector2f dir(cosf(angle),sinf(angle));
-	if (pos.y >= 0 && pos.y + (2 * radius) <= screenh)
-		point += dir * dist;
+	point += dir * dist;
 }
 
 bool ball::BouncePaddle(paddle pad) {
@@ -53,4 +52,11 @@ bool ball::BouncePaddle(paddle pad) {
 	float distanceY = center.y - closestY;
 	float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
 	return distanceSquared < (radius * radius);
+}
+
+bool ball::BounceWall(int screenh) {
+	if (pos.y <= 0 || pos.y + (2 * radius) >= screenh)
+		return true;
+	else
+		return false;
 }

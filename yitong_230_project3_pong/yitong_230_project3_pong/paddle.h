@@ -7,6 +7,8 @@
 #include <SFML/Main.hpp>
 #pragma once
 
+using namespace sf;
+
 class paddle
 {
 public:
@@ -17,7 +19,7 @@ public:
 	float speed = 0.5;
 	float move = 0;
 
-	sf::RectangleShape SpawnPads(int, int, float, float, bool);
+	RectangleShape SpawnPads(int, int, float, float, bool);
 	void PlayerControl(int);
 	void AIMove(int, float, float);
 };
