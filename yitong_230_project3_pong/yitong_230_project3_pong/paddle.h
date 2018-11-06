@@ -18,9 +18,12 @@ public:
 	float width;
 	float speed = 0.5;
 	float move = 0;
+	bool obsUp = false;
 
 	RectangleShape SpawnPads(int, int, float, float, bool, Texture&, Texture&, int, bool);
-	void PlayerControl(int, bool);
+	RectangleShape SpawnObstacle(int);
+	void MoveObstacle();
+	void PlayerControl(int, bool, int);
 	void AIMove(int, float, float);
 };
 

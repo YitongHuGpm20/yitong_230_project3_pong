@@ -22,8 +22,6 @@ string toString(T arg){
 	return ss.str();
 }
 
-void UpdateState(ball, paddle, paddle, int, SoundBuffer);
-
 int screenw = 800;
 int screenh = 600;
 int scoreLeft = 0, scoreRight = 0;
@@ -34,12 +32,12 @@ int main()
 {
 	srand(time(0));
 	ball ball;
-	paddle pad1, pad2, pad3;
+	paddle pad1, pad2, pad3, obstacle;
 	float ax, ay;
 	do {
 		ax = rand() % screenw - (screenw / 2);
 		ay = rand() % screenh - (screenh / 2);
-	} while (ax * ax < ay * ay);
+	} while (ax * ax <= ay * ay && (ay * ay <= 202500 || ay * ay >= 22500));
 	float angle = atan2f(ay, ax);
 	float speed = 0.3;
 	float radius = 30;
@@ -55,10 +53,10 @@ int main()
 	shell.loadFromFile("shell.png");
 	
 	RenderWindow window(VideoMode(screenw, screenh), "Slugs and Shell");
+	window.draw(ball.SpawnBall(screenw, screenh, radius, shell));
 	RectangleShape middle;
 	middle.setSize(Vector2f(3.f, screenh));
 	middle.setPosition(Vector2f(((screenw - 3) / 2), 0));
-	window.draw(ball.SpawnBall(screenw, screenh, radius, shell));
 	
 	Font font;
 	font.loadFromFile("arial.ttf");
@@ -69,9 +67,10 @@ int main()
 	score.setPosition(screenw / 2 - 40, 0);
 	score.setFillColor(Color::Cyan);
 	
-	
 	SoundBuffer bounce;
 	bounce.loadFromFile("bounce.wav");
+	Sound bouncese;
+	bouncese.setBuffer(bounce);
 	bool playBounce = false;
 	
 	Text select;
@@ -140,6 +139,7 @@ int main()
 		window.draw(middle);
 		window.draw(score);
 		window.draw(ball.PrintBall(shell, rotateAngle));
+		window.draw(obstacle.SpawnObstacle(screenw));
 		if(gameMode == 1 || gameMode == 2)
 			window.draw(pad1.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, false));
 		else if (gameMode == 3) {
@@ -148,28 +148,36 @@ int main()
 		}
 		window.draw(pad2.SpawnPads(screenw, screenh, 45, 128, false, slugleft, slugright, gameMode, false));
 		window.display();
-		pad1.PlayerControl(screenh, true);
+		pad1.PlayerControl(screenh, true, gameMode);
 		if (gameMode == 1)
 			pad2.AIMove(screenh, ball.pos.y, ball.radius);
 		else if (gameMode == 2)
-			pad2.PlayerControl(screenh, false);
+			pad2.PlayerControl(screenh, false, gameMode);
 		else if (gameMode == 3) {
 			pad2.AIMove(screenh, ball.pos.y, ball.radius);
-			pad3.PlayerControl(screenh, false);
+			pad3.PlayerControl(screenh, false, gameMode);
 		}
-		if (gameMode == 1 || gameMode == 2) {
-			if (ball.BouncePaddle(pad1, screenw) || ball.BouncePaddle(pad2, screenw)) {
+		if (ball.BouncePaddle(obstacle, screenw)) {
+			ax = -ax;
+			bouncese.play();
+		}
+		else if (ball.BouncePaddle(pad1, screenw)) {
+			ax = -ax;
+			speed += 0.02;
+			bouncese.play();
+		}
+		else if (ball.BouncePaddle(pad2, screenw)) {
+			ax = -ax;
+			speed += 0.02;
+			bouncese.play();
+		}
+		if (gameMode == 3) {
+			if (ball.BouncePaddle(pad3, screenw)) {
 				ax = -ax;
 				speed += 0.02;
+				bouncese.play();
 			}
 		}
-		else if (gameMode == 3) {
-			if (ball.BouncePaddle(pad1, screenw) || ball.BouncePaddle(pad2, screenw) || ball.BouncePaddle(pad3, screenw)) {
-				ax = -ax;
-				speed += 0.02;
-			}
-		}
-		//UpdateState(ball, pad1, pad2, screenw, bounce);
 		if (ball.BounceWall(screenh))
 			ay = -ay;
 		angle = atan2f(ay, ax);
@@ -187,6 +195,8 @@ int main()
 			angle = atan2f(ay, ax);
 			speed = 0.3;
 			count = 0;
+			obstacle.x = (screenw - obstacle.width) / 2;
+			obstacle.move = 0;
 		}
 		if (ball.pos.x >= screenw) {
 			scoreLeft++;
@@ -199,6 +209,8 @@ int main()
 			angle = atan2f(ay, ax);
 			speed = 0.3;
 			count = 0;
+			obstacle.x = (screenw - obstacle.width) / 2;
+			obstacle.move = 0;
 		}
 		Text win;
 		win.setFont(font);
@@ -249,14 +261,15 @@ int main()
 		scoreRighttext = toString<int>(scoreRight);
 		printscore = scoreLefttext + "  " + scoreRighttext;
 		score.setString(printscore);
+		if (count >= 1000) {
+			if (obstacle.y >= screenh - 120) {
+				obstacle.obsUp = true;
+			}
+			else if (obstacle.y <= 0) {
+				obstacle.obsUp = false;
+			}
+			obstacle.MoveObstacle();
+		}
 	}
 	return 0;
-}
-
-void UpdateState(ball ball, paddle pad1, paddle pad2, int screenw, SoundBuffer bounce) {
-	Sound bouncesound;
-	bouncesound.setBuffer(bounce);
-	if ((ball.BouncePaddle(pad1, screenw) || ball.BouncePaddle(pad2, screenw)) && bouncesound.getStatus() != SoundSource::Playing)
-		bouncesound.play();
-
 }
