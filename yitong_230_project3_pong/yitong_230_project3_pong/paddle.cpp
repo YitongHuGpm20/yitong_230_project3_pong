@@ -12,7 +12,7 @@
 using namespace std;
 using namespace sf;
 
-RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float length, bool isLeft, Texture &slugleft, Texture &slugright) {
+RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float length, bool isLeft, Texture &slugleft, Texture &slugright, int gameMode, bool isSecondLeft) {
 	RectangleShape shape;
 	shape.setSize(Vector2f(width, length));
 	shape.setPosition(Vector2f(x, y));
@@ -24,20 +24,37 @@ RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float le
 		x = screenw - width;
 		shape.setTexture(&slugright);
 	}
-	y = (screenh - length) / 2 + move;
+	if(gameMode == 3 && !isSecondLeft)
+		y = (screenh - length) / 4 + move;
+	else if(gameMode == 3 && isSecondLeft)
+		y = (screenh - length) / 4 * 3 + move;
+	else if(gameMode == 1 || gameMode == 2)
+		y = (screenh - length) / 2 + move;
 	this->length = length;
 	this->width = width;
 	return shape;
 }
 
-void paddle::PlayerControl(int screenh) {
-	if (Keyboard::isKeyPressed(Keyboard::W)) {
-		if (move >= ((length - screenh) / 2))
-			move -= speed;
+void paddle::PlayerControl(int screenh, bool isLeft) {
+	if (isLeft) {
+		if (Keyboard::isKeyPressed(Keyboard::W)) {
+			if (move >= ((length - screenh) / 2))
+				move -= speed;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::S)) {
+			if (move <= ((screenh - length) / 2))
+				move += speed;
+		}
 	}
-	else if (Keyboard::isKeyPressed(Keyboard::S)) {
-		if (move <= ((screenh - length) / 2))
-			move += speed;
+	else {
+		if (Keyboard::isKeyPressed(Keyboard::Up)) {
+			if (move >= ((length - screenh) / 2))
+				move -= speed;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::Down)) {
+			if (move <= ((screenh - length) / 2))
+				move += speed;
+		}
 	}
 }
 
