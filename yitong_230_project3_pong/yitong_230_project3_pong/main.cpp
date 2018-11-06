@@ -39,16 +39,21 @@ int main()
 		ay = rand() % screenh - (screenh / 2);
 	} while (ax * ax < ay * ay);
 	float angle = atan2f(ay, ax);
-	float speed = 0.4;
-	float radius = 20;
+	float speed = 0.3;
+	float radius = 30;
 	int countwin = 0;
 	int count = 0;
-
-	RenderWindow window(VideoMode(screenw, screenh), "Yitong's Pong");
+	Texture slugleft;
+	slugleft.loadFromFile("slugleft.png");
+	Texture slugright;
+	slugright.loadFromFile("slugright.png");
+	Texture shell;
+	shell.loadFromFile("shell.png");
+	RenderWindow window(VideoMode(screenw, screenh), "Slugs and Shell");
 	RectangleShape middle;
 	middle.setSize(Vector2f(3.f, screenh));
 	middle.setPosition(Vector2f(((screenw - 3) / 2), 0));
-	window.draw(ball.SpawnBall(screenw, screenh, radius));
+	window.draw(ball.SpawnBall(screenw, screenh, radius, shell));
 	Font font;
 	font.loadFromFile("arial.ttf");
 	Text score;
@@ -57,6 +62,7 @@ int main()
 	score.setString("0  0");
 	score.setPosition(screenw / 2 - 40, 0);
 	score.setFillColor(Color::Cyan);
+	float rotateAngle = 0;
 	
 	while (window.isOpen()){
 		Event event;
@@ -65,16 +71,20 @@ int main()
 				window.close();
 		}
 		isWon = false;
+		if (rotateAngle != 360)
+			rotateAngle += 5;
+		else
+			rotateAngle = 0;
 		window.clear();
 		window.draw(middle);
 		window.draw(score);
-		window.draw(ball.PrintBall());
-		window.draw(pad1.SpawnPads(screenw, screenh, 20, 120, true));
-		window.draw(pad2.SpawnPads(screenw, screenh, 20, 120, false));
+		window.draw(ball.PrintBall(shell, rotateAngle));
+		window.draw(pad1.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright));
+		window.draw(pad2.SpawnPads(screenw, screenh, 45, 128, false, slugleft, slugright));
 		window.display();
 		pad1.PlayerControl(screenh);
 		pad2.AIMove(screenh, ball.pos.y, ball.radius);
-		if (ball.BouncePaddle(pad1) || ball.BouncePaddle(pad2)) {
+		if (ball.BouncePaddle(pad1, screenw) || ball.BouncePaddle(pad2, screenw)) {
 			ax = -ax;
 			speed += 0.02;
 		}
@@ -93,7 +103,7 @@ int main()
 				ay = rand() % screenh - (screenh / 2);
 			} while (ax * ax < ay * ay);
 			angle = atan2f(ay, ax);
-			speed = 0.4;
+			speed = 0.3;
 			count = 0;
 		}
 		if (ball.pos.x >= screenw) {
@@ -105,7 +115,7 @@ int main()
 				ay = rand() % screenh - (screenh / 2);
 			} while (ax * ax < ay * ay);
 			angle = atan2f(ay, ax);
-			speed = 0.4;
+			speed = 0.3;
 			count = 0;
 		}
 		Text win;
@@ -130,10 +140,6 @@ int main()
 		if (isWon) {
 			scoreLeft = 0;
 			scoreRight = 0;
-			/*do {
-				window.draw(win);
-				countwin++;
-			} while (countwin <= 1000);*/
 			ball.pos.x = screenw / 2 - radius;
 			ball.pos.y = screenh / 2 - radius;
 			do {
@@ -141,7 +147,7 @@ int main()
 				ay = rand() % screenh - (screenh / 2);
 			} while (ax * ax < ay * ay);
 			angle = atan2f(ay, ax);
-			speed = 0.4;
+			speed = 0.3;
 			count = 0;
 			RenderWindow message(VideoMode(300, 100), "Winner");
 

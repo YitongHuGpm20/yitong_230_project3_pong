@@ -18,10 +18,10 @@ public:
 	Vector2f center;
 	float radius;
 
-	CircleShape SpawnBall(int, int, float);
-	CircleShape PrintBall();
+	CircleShape SpawnBall(int, int, float, Texture&);
+	CircleShape PrintBall(Texture&, float);
 	void MoveBall(Vector2f &, float, float, int);
-	bool BouncePaddle(paddle);
+	bool BouncePaddle(paddle, int);
 	bool BounceWall(int);
 };
 

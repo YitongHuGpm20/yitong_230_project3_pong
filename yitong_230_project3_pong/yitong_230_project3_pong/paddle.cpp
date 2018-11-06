@@ -12,15 +12,19 @@
 using namespace std;
 using namespace sf;
 
-RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float length, bool isLeft) {
-	if (isLeft)
-		x = 0;
-	else 
-		x = screenw - width;
-	y = (screenh - length) / 2 + move;
+RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float length, bool isLeft, Texture &slugleft, Texture &slugright) {
 	RectangleShape shape;
 	shape.setSize(Vector2f(width, length));
 	shape.setPosition(Vector2f(x, y));
+	if (isLeft) {
+		x = 0;
+		shape.setTexture(&slugleft);
+	}	
+	else {
+		x = screenw - width;
+		shape.setTexture(&slugright);
+	}
+	y = (screenh - length) / 2 + move;
 	this->length = length;
 	this->width = width;
 	return shape;

@@ -21,7 +21,7 @@ float clamp(float value, float min, float max) {
 		return value;
 }
 
-CircleShape ball::SpawnBall(int screenw, int screenh, float radius) {
+CircleShape ball::SpawnBall(int screenw, int screenh, float radius, Texture &shell) {
 	pos.x = screenw / 2 - radius;
 	pos.y = screenh / 2 - radius;
 	this->radius = radius;
@@ -29,14 +29,18 @@ CircleShape ball::SpawnBall(int screenw, int screenh, float radius) {
 	center.y = pos.y + radius;
 	CircleShape shape(this->radius);
 	shape.setPosition(Vector2f(pos));
+	shape.setTexture(&shell);
 	return shape;
 }
 
-CircleShape ball::PrintBall() {
+CircleShape ball::PrintBall(Texture &shell, float angle) {
 	center.x = pos.x + radius;
 	center.y = pos.y + radius;
 	CircleShape shape(radius);
 	shape.setPosition(Vector2f(pos));
+	shape.setTexture(&shell);
+	//shape.setOrigin(pos.x + radius, pos.y + radius);
+	//shape.setRotation(angle);
 	return shape;
 }
 
@@ -45,8 +49,12 @@ void ball::MoveBall(Vector2f& point, float angle, float dist, int screenh) {
 	point += dir * dist;
 }
 
-bool ball::BouncePaddle(paddle pad) {
-	float closestX = clamp(center.x, pad.x, pad.x + pad.width);
+bool ball::BouncePaddle(paddle pad, int screenw) {
+	float closestX;
+	if(pos.x < screenw / 2)
+		closestX = clamp(center.x, pad.x, pad.x + pad.width - 30);
+	else
+		closestX = clamp(center.x, pad.x + 30, pad.x + pad.width);
 	float closestY = clamp(center.y, pad.y, pad.y + pad.length);
 	float distanceX = center.x - closestX;
 	float distanceY = center.y - closestY;

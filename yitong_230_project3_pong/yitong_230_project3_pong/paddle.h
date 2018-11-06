@@ -19,7 +19,7 @@ public:
 	float speed = 0.5;
 	float move = 0;
 
-	RectangleShape SpawnPads(int, int, float, float, bool);
+	RectangleShape SpawnPads(int, int, float, float, bool, Texture&, Texture&);
 	void PlayerControl(int);
 	void AIMove(int, float, float);
 };
