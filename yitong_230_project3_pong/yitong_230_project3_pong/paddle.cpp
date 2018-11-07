@@ -18,20 +18,43 @@ RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float le
 	shape.setPosition(Vector2f(x, y));
 	if (isLeft) {
 		x = 0;
-		shape.setTexture(&slugleft);
+		texture = slugleft;
 	}	
 	else {
 		x = screenw - width;
-		shape.setTexture(&slugright);
+		texture = slugright;
 	}
+	shape.setTexture(&texture);
 	if(gameMode == 3 && !isSecondLeft)
-		y = (screenh - length) / 4 + move;
+		y = (screenh - length) / 4;
 	else if(gameMode == 3 && isSecondLeft)
-		y = (screenh - length) / 4 * 3 + move;
+		y = (screenh - length) / 4 * 3;
 	else if(gameMode == 1 || gameMode == 2)
-		y = (screenh - length) / 2 + move;
+		y = (screenh - length) / 2;
 	this->length = length;
 	this->width = width;
+	return shape;
+}
+
+RectangleShape paddle::PrintPads(int screenw, int screenh, bool isLeft, Texture &slugleft, Texture &slugright, int gameMode, bool isSecondLeft) {
+	RectangleShape shape;
+	shape.setSize(Vector2f(width, length));
+	shape.setPosition(Vector2f(x, y));
+	if (isLeft) {
+		x = 0;
+		texture = slugleft;
+	}
+	else {
+		x = screenw - width;
+		texture = slugright;
+	}
+	shape.setTexture(&texture);
+	if (gameMode == 3 && !isSecondLeft)
+		y = (screenh - length) / 4 + move;
+	else if (gameMode == 3 && isSecondLeft)
+		y = (screenh - length) / 4 * 3 + move;
+	else if (gameMode == 1 || gameMode == 2)
+		y = (screenh - length) / 2 + move;
 	return shape;
 }
 
@@ -113,4 +136,8 @@ void paddle::AIMove(int screenh, float bally, float radius, int gameMode) {
 		move += speed;
 	else if (y - miss > bally + radius && move >= (length - screenh) / 2)
 		move -= speed;
+}
+
+void paddle::MoveAnimation(bool Left, Texture& slugleft, Texture& slugleftmove, Texture& slugright, Texture& slugrightmove) {
+	
 }

@@ -47,8 +47,12 @@ int main()
 	
 	Texture slugleft;
 	slugleft.loadFromFile("slugleft.png");
+	Texture slugleftmove;
+	slugleftmove.loadFromFile("slugleftmove.png");
 	Texture slugright;
 	slugright.loadFromFile("slugright.png");
+	Texture slugrightmove;
+	slugrightmove.loadFromFile("slugrightmove.png");
 	Texture shell;
 	shell.loadFromFile("shell.png");
 	Texture background;
@@ -62,6 +66,8 @@ int main()
 	forest.setTexture(&background);
 	forest.setSize(Vector2f(screenw, screenh));
 	forest.setPosition(Vector2f(0, 0));
+	//CircleShape powerup(20);
+	//powerup.setFillColor(Color::Green);
 	
 	Font font;
 	font.loadFromFile("arial.ttf");
@@ -71,6 +77,12 @@ int main()
 	score.setString("0  0");
 	score.setPosition(screenw / 2 - 40, 0);
 	score.setFillColor(Color::Cyan);
+	Text timer;
+	timer.setFont(font);
+	timer.setCharacterSize(72);
+	timer.setPosition(screenw / 2, 30);
+	timer.setOutlineColor(Color::Magenta);
+	timer.setFillColor(Color::Red);
 	
 	SoundBuffer bounce;
 	bounce.loadFromFile("bounce.wav");
@@ -84,6 +96,14 @@ int main()
 	bgm.openFromFile("bgm.ogg");
 	bgm.setLoop(true);
 	bgm.play();
+	SoundBuffer glass;
+	glass.loadFromFile("score.wav");
+	Sound getscore;
+	getscore.setBuffer(glass);
+	SoundBuffer clap;
+	clap.loadFromFile("win.wav");
+	Sound winsound;
+	winsound.setBuffer(clap);
 	
 	Text select;
 	select.setFont(font);
@@ -135,6 +155,14 @@ int main()
 		menu.display();
 	}
 	
+	if (gameMode == 1 || gameMode == 2)
+		window.draw(pad1.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, false));
+	else if (gameMode == 3) {
+		window.draw(pad1.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, false));
+		window.draw(pad3.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, true));
+	}
+	window.draw(pad2.SpawnPads(screenw, screenh, 45, 128, false, slugleft, slugright, gameMode, false));
+
 	while (window.isOpen()){
 		Event event;
 		while (window.pollEvent(event)){
@@ -142,23 +170,22 @@ int main()
 				window.close();
 		}
 		isWon = false;
-		if (rotateAngle != 360)
+		/*if (rotateAngle != 360)
 			rotateAngle += 1;
 		else
-			rotateAngle = 0;
+			rotateAngle = 0;*/
 		window.clear();
 		window.draw(forest);
 		window.draw(score);
 		window.draw(ball.PrintBall(shell, rotateAngle));
 		window.draw(obstacle.SpawnObstacle(screenw, wood));
-		
 		if(gameMode == 1 || gameMode == 2)
-			window.draw(pad1.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, false));
+			window.draw(pad1.PrintPads(screenw, screenh, true, slugleft, slugright, gameMode, false));
 		else if (gameMode == 3) {
-			window.draw(pad1.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, false));
-			window.draw(pad3.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, true));
+			window.draw(pad1.PrintPads(screenw, screenh, true, slugleft, slugright, gameMode, false));
+			window.draw(pad3.PrintPads(screenw, screenh, true, slugleft, slugright, gameMode, true));
 		}
-		window.draw(pad2.SpawnPads(screenw, screenh, 45, 128, false, slugleft, slugright, gameMode, false));
+		window.draw(pad2.PrintPads(screenw, screenh, false, slugleft, slugright, gameMode, false));
 		window.display();
 		pad1.PlayerControl(screenh, true, gameMode);
 		if (gameMode == 1)
@@ -180,13 +207,13 @@ int main()
 			speed += 0.02;
 			bouncese.play();
 		}
-		else if (ball.BouncePaddle(pad2, screenw && ax >= 0)) {
+		else if (ball.BouncePaddle(pad2, screenw) && ax >= 0) {
 			ax = -ax;
 			speed += 0.02;
 			bouncese.play();
 		}
 		if (gameMode == 3) {
-			if (ball.BouncePaddle(pad3, screenw && ax < 0)) {
+			if (ball.BouncePaddle(pad3, screenw) && ax < 0) {
 				ax = -ax;
 				speed += 0.02;
 				bouncese.play();
@@ -202,6 +229,7 @@ int main()
 			ball.MoveBall(ball.pos, angle, speed, screenh);
 		if (ball.pos.x <= ball.radius * (-2)) {
 			scoreRight++;
+			getscore.play();
 			ball.pos.x = screenw / 2 - radius;
 			ball.pos.y = screenh / 2 - radius;
 			do {
@@ -216,6 +244,7 @@ int main()
 		}
 		if (ball.pos.x >= screenw) {
 			scoreLeft++;
+			getscore.play();
 			ball.pos.x = screenw / 2 - radius;
 			ball.pos.y = screenh / 2 - radius;
 			do {
@@ -250,6 +279,7 @@ int main()
 		if (isWon) {
 			scoreLeft = 0;
 			scoreRight = 0;
+			winsound.play();
 			ball.pos.x = screenw / 2 - radius;
 			ball.pos.y = screenh / 2 - radius;
 			do {
