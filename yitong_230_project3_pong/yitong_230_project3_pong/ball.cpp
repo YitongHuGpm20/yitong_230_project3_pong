@@ -47,6 +47,7 @@ CircleShape ball::PrintBall(Texture &shell, float angle) {
 void ball::MoveBall(Vector2f& point, float angle, float dist, int screenh) {
 	Vector2f dir(cosf(angle),sinf(angle));
 	point += dir * dist;
+	//pos = point;
 }
 
 bool ball::BouncePaddle(paddle pad, int screenw) {

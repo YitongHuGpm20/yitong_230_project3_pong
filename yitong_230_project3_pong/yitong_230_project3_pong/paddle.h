@@ -21,9 +21,9 @@ public:
 	bool obsUp = false;
 
 	RectangleShape SpawnPads(int, int, float, float, bool, Texture&, Texture&, int, bool);
-	RectangleShape SpawnObstacle(int);
+	RectangleShape SpawnObstacle(int, Texture&);
 	void MoveObstacle();
 	void PlayerControl(int, bool, int);
-	void AIMove(int, float, float);
+	void AIMove(int, float, float, int);
 };
 

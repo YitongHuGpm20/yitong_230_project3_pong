@@ -35,7 +35,7 @@ RectangleShape paddle::SpawnPads(int screenw, int screenh, float width, float le
 	return shape;
 }
 
-RectangleShape paddle::SpawnObstacle(int screenw) {
+RectangleShape paddle::SpawnObstacle(int screenw, Texture& wood) {
 	RectangleShape shape;
 	width = 20;
 	length = 120;
@@ -43,7 +43,7 @@ RectangleShape paddle::SpawnObstacle(int screenw) {
 	x = (screenw - width) / 2;
 	y = move;
 	shape.setPosition(Vector2f(x, y));
-	shape.setFillColor(Color::Magenta);
+	shape.setTexture(&wood);
 	return shape;
 }
 
@@ -102,9 +102,13 @@ void paddle::PlayerControl(int screenh, bool isLeft, int gameMode) {
 	
 }
 
-void paddle::AIMove(int screenh, float bally, float radius) {
+void paddle::AIMove(int screenh, float bally, float radius, int gameMode) {
 	srand(time(0));
-	float miss = rand() % 40;
+	float miss;
+	if (gameMode == 3)
+		miss = rand() % 20;
+	else
+		miss = rand() % 40;
 	if (y + length + miss < bally + radius && move <= (screenh - length) / 2)
 		move += speed;
 	else if (y - miss > bally + radius && move >= (length - screenh) / 2)

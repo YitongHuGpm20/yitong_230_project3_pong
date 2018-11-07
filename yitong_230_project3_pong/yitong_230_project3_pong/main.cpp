@@ -51,12 +51,17 @@ int main()
 	slugright.loadFromFile("slugright.png");
 	Texture shell;
 	shell.loadFromFile("shell.png");
+	Texture background;
+	background.loadFromFile("forest.jpg");
+	Texture wood;
+	wood.loadFromFile("wood.jpg");
 	
 	RenderWindow window(VideoMode(screenw, screenh), "Slugs and Shell");
 	window.draw(ball.SpawnBall(screenw, screenh, radius, shell));
-	RectangleShape middle;
-	middle.setSize(Vector2f(3.f, screenh));
-	middle.setPosition(Vector2f(((screenw - 3) / 2), 0));
+	RectangleShape forest;
+	forest.setTexture(&background);
+	forest.setSize(Vector2f(screenw, screenh));
+	forest.setPosition(Vector2f(0, 0));
 	
 	Font font;
 	font.loadFromFile("arial.ttf");
@@ -71,7 +76,14 @@ int main()
 	bounce.loadFromFile("bounce.wav");
 	Sound bouncese;
 	bouncese.setBuffer(bounce);
-	bool playBounce = false;
+	SoundBuffer bouncewall;
+	bouncewall.loadFromFile("bouncewall.wav");
+	Sound wall;
+	wall.setBuffer(bouncewall);
+	Music bgm;
+	bgm.openFromFile("bgm.ogg");
+	bgm.setLoop(true);
+	bgm.play();
 	
 	Text select;
 	select.setFont(font);
@@ -122,7 +134,7 @@ int main()
 		menu.draw(ppve);
 		menu.display();
 	}
-
+	
 	while (window.isOpen()){
 		Event event;
 		while (window.pollEvent(event)){
@@ -130,16 +142,16 @@ int main()
 				window.close();
 		}
 		isWon = false;
-		playBounce = false;
 		if (rotateAngle != 360)
-			rotateAngle += 5;
+			rotateAngle += 1;
 		else
 			rotateAngle = 0;
 		window.clear();
-		window.draw(middle);
+		window.draw(forest);
 		window.draw(score);
 		window.draw(ball.PrintBall(shell, rotateAngle));
-		window.draw(obstacle.SpawnObstacle(screenw));
+		window.draw(obstacle.SpawnObstacle(screenw, wood));
+		
 		if(gameMode == 1 || gameMode == 2)
 			window.draw(pad1.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, false));
 		else if (gameMode == 3) {
@@ -150,36 +162,40 @@ int main()
 		window.display();
 		pad1.PlayerControl(screenh, true, gameMode);
 		if (gameMode == 1)
-			pad2.AIMove(screenh, ball.pos.y, ball.radius);
+			pad2.AIMove(screenh, ball.pos.y, ball.radius, gameMode);
 		else if (gameMode == 2)
 			pad2.PlayerControl(screenh, false, gameMode);
 		else if (gameMode == 3) {
-			pad2.AIMove(screenh, ball.pos.y, ball.radius);
+			pad2.AIMove(screenh, ball.pos.y, ball.radius, gameMode);
 			pad3.PlayerControl(screenh, false, gameMode);
 		}
 		if (ball.BouncePaddle(obstacle, screenw)) {
-			ax = -ax;
-			bouncese.play();
+			if ((ball.center.x <= screenw / 2 && ax >= 0) || (ball.center.x > screenw / 2 && ax < 0)) {
+				ax = -ax;
+				bouncese.play();
+			}
 		}
-		else if (ball.BouncePaddle(pad1, screenw)) {
+		else if (ball.BouncePaddle(pad1, screenw) && ax < 0) {
 			ax = -ax;
 			speed += 0.02;
 			bouncese.play();
 		}
-		else if (ball.BouncePaddle(pad2, screenw)) {
+		else if (ball.BouncePaddle(pad2, screenw && ax >= 0)) {
 			ax = -ax;
 			speed += 0.02;
 			bouncese.play();
 		}
 		if (gameMode == 3) {
-			if (ball.BouncePaddle(pad3, screenw)) {
+			if (ball.BouncePaddle(pad3, screenw && ax < 0)) {
 				ax = -ax;
 				speed += 0.02;
 				bouncese.play();
 			}
 		}
-		if (ball.BounceWall(screenh))
+		if (ball.BounceWall(screenh)) {
 			ay = -ay;
+			wall.play();
+		}
 		angle = atan2f(ay, ax);
 		count++;
 		if(count >= 1000)
@@ -247,7 +263,7 @@ int main()
 			while (message.isOpen()) {
 				Event eventm;
 				while (message.pollEvent(eventm)) {
-					if (Keyboard::isKeyPressed(Keyboard::Space) || eventm.type == Event::Closed)
+					if (Keyboard::isKeyPressed(Keyboard::Space))
 						message.close();
 				}
 				message.clear();
