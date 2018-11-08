@@ -44,9 +44,9 @@ CircleShape ball::PrintBall(Texture &shell, float angle) {
 	return shape;
 }
 
-void ball::MoveBall(Vector2f& point, float angle, float dist, int screenh) {
+void ball::MoveBall(Vector2f& point, float angle, float dist, int screenh, float dt) {
 	Vector2f dir(cosf(angle),sinf(angle));
-	point += dir * dist;
+	point += dir * dist * dt;
 	//pos = point;
 }
 
@@ -56,7 +56,7 @@ bool ball::BouncePaddle(paddle pad, int screenw) {
 		closestX = clamp(center.x, pad.x, pad.x + pad.width - 30);
 	else
 		closestX = clamp(center.x, pad.x + 30, pad.x + pad.width);
-	float closestY = clamp(center.y, pad.y, pad.y + pad.length);
+	float closestY = clamp(center.y, pad.y + 5, pad.y + pad.length - 5);
 	float distanceX = center.x - closestX;
 	float distanceY = center.y - closestY;
 	float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);

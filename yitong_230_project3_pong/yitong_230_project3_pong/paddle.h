@@ -24,9 +24,9 @@ public:
 	RectangleShape SpawnPads(int, int, float, float, bool, Texture&, Texture&, int, bool);
 	RectangleShape PrintPads(int, int, bool, Texture&, Texture&, int, bool);
 	RectangleShape SpawnObstacle(int, Texture&);
-	void MoveObstacle();
-	void PlayerControl(int, bool, int);
-	void AIMove(int, float, float, int);
+	void MoveObstacle(float);
+	void PlayerControl(int, bool, int, float);
+	void AIMove(int, float, float, int, float);
 	void MoveAnimation(bool, Texture&, Texture&, Texture&, Texture&);
 };
 

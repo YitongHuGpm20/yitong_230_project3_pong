@@ -70,33 +70,33 @@ RectangleShape paddle::SpawnObstacle(int screenw, Texture& wood) {
 	return shape;
 }
 
-void paddle::MoveObstacle() {
+void paddle::MoveObstacle(float dt) {
 	if (!obsUp)
-		move += 0.1;
+		move += 0.1 * dt;
 	else
-		move -= 0.1;
+		move -= 0.1 * dt;
 }
 
-void paddle::PlayerControl(int screenh, bool isLeft, int gameMode) {
+void paddle::PlayerControl(int screenh, bool isLeft, int gameMode, float dt) {
 	if (gameMode == 1 || gameMode == 2) {
 		if (isLeft) {
 			if (Keyboard::isKeyPressed(Keyboard::W)) {
 				if (y >= 0)
-					move -= speed;
+					move -= speed * dt;
 			}
 			else if (Keyboard::isKeyPressed(Keyboard::S)) {
 				if (y + length <= screenh)
-					move += speed;
+					move += speed * dt;
 			}
 		}
 		else {
 			if (Keyboard::isKeyPressed(Keyboard::Up)) {
 				if (y >= 0)
-					move -= speed;
+					move -= speed * dt;
 			}
 			else if (Keyboard::isKeyPressed(Keyboard::Down)) {
 				if (y + length <= screenh)
-					move += speed;
+					move += speed * dt;
 			}
 		}
 	}
@@ -104,38 +104,37 @@ void paddle::PlayerControl(int screenh, bool isLeft, int gameMode) {
 		if (isLeft) {
 			if (Keyboard::isKeyPressed(Keyboard::W)) {
 				if (y >= 0)
-					move -= speed;
+					move -= speed * dt;
 			}
 			else if (Keyboard::isKeyPressed(Keyboard::S)) {
 				if (y + length <= screenh / 2)
-					move += speed;
+					move += speed * dt;
 			}
 		}
 		else {
 			if (Keyboard::isKeyPressed(Keyboard::Up)) {
 				if (y >= screenh / 2)
-					move -= speed;
+					move -= speed * dt;
 			}
 			else if (Keyboard::isKeyPressed(Keyboard::Down)) {
 				if (y + length <= screenh)
-					move += speed;
+					move += speed * dt;
 			}
 		}
 	}
-	
 }
 
-void paddle::AIMove(int screenh, float bally, float radius, int gameMode) {
+void paddle::AIMove(int screenh, float bally, float radius, int gameMode, float dt) {
 	srand(time(0));
 	float miss;
 	if (gameMode == 3)
-		miss = rand() % 20;
+		miss = rand() % 10;
 	else
-		miss = rand() % 40;
+		miss = rand() % 30;
 	if (y + length + miss < bally + radius && move <= (screenh - length) / 2)
-		move += speed;
+		move += speed * dt;
 	else if (y - miss > bally + radius && move >= (length - screenh) / 2)
-		move -= speed;
+		move -= speed * dt;
 }
 
 void paddle::MoveAnimation(bool Left, Texture& slugleft, Texture& slugleftmove, Texture& slugright, Texture& slugrightmove) {

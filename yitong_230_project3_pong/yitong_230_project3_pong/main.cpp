@@ -44,6 +44,7 @@ int main()
 	int countwin = 0;
 	int count = 0;
 	float rotateAngle = 0;
+	Clock clock;
 	
 	Texture slugleft;
 	slugleft.loadFromFile("slugleft.png");
@@ -162,7 +163,8 @@ int main()
 		window.draw(pad3.SpawnPads(screenw, screenh, 45, 128, true, slugleft, slugright, gameMode, true));
 	}
 	window.draw(pad2.SpawnPads(screenw, screenh, 45, 128, false, slugleft, slugright, gameMode, false));
-
+	float dt = clock.restart().asSeconds();
+	
 	while (window.isOpen()){
 		Event event;
 		while (window.pollEvent(event)){
@@ -170,6 +172,7 @@ int main()
 				window.close();
 		}
 		isWon = false;
+		//float dt = clock.restart().asSeconds();
 		/*if (rotateAngle != 360)
 			rotateAngle += 1;
 		else
@@ -187,14 +190,14 @@ int main()
 		}
 		window.draw(pad2.PrintPads(screenw, screenh, false, slugleft, slugright, gameMode, false));
 		window.display();
-		pad1.PlayerControl(screenh, true, gameMode);
+		pad1.PlayerControl(screenh, true, gameMode, dt);
 		if (gameMode == 1)
-			pad2.AIMove(screenh, ball.pos.y, ball.radius, gameMode);
+			pad2.AIMove(screenh, ball.pos.y, ball.radius, gameMode, dt);
 		else if (gameMode == 2)
-			pad2.PlayerControl(screenh, false, gameMode);
+			pad2.PlayerControl(screenh, false, gameMode, dt);
 		else if (gameMode == 3) {
-			pad2.AIMove(screenh, ball.pos.y, ball.radius, gameMode);
-			pad3.PlayerControl(screenh, false, gameMode);
+			pad2.AIMove(screenh, ball.pos.y, ball.radius, gameMode, dt);
+			pad3.PlayerControl(screenh, false, gameMode, dt);
 		}
 		if (ball.BouncePaddle(obstacle, screenw)) {
 			if ((ball.center.x <= screenw / 2 && ax >= 0) || (ball.center.x > screenw / 2 && ax < 0)) {
@@ -226,7 +229,7 @@ int main()
 		angle = atan2f(ay, ax);
 		count++;
 		if(count >= 1000)
-			ball.MoveBall(ball.pos, angle, speed, screenh);
+			ball.MoveBall(ball.pos, angle, speed, screenh, dt);
 		if (ball.pos.x <= ball.radius * (-2)) {
 			scoreRight++;
 			getscore.play();
@@ -314,7 +317,7 @@ int main()
 			else if (obstacle.y <= 0) {
 				obstacle.obsUp = false;
 			}
-			obstacle.MoveObstacle();
+			obstacle.MoveObstacle(dt);
 		}
 	}
 	return 0;
